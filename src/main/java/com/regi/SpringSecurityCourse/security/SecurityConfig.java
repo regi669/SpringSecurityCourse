@@ -48,12 +48,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails user = User.withUsername("admin").password("12345").authorities("admin").build();
         userDetailsService.createUser(user);
         auth.userDetailsService(userDetailsService);
-    }*/
+    }
 
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
         return new JdbcUserDetailsManager(dataSource); //In order to use this we need to create users and authorities tables in database
-    }
+    }*/
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
