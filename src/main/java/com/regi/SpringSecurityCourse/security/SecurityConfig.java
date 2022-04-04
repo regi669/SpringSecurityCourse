@@ -56,4 +56,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JdbcUserDetailsManager(dataSource); //In order to use this we need to create users and authorities tables in database
     }*/
 
+
 }
