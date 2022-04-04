@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -28,17 +29,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        List<CustomerEntity> customerEntities = customerRepository.findByEmail(username);
-        if (customerEntities.size() > 0 ) {
-            if (passwordEncoder.matches(pwd, customerEntities.get(0).getPwd())) {
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority(customerEntities.get(0).getRole()));
-                return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
-            } else {
-                throw new BadCredentialsException("Invalid password!");
-            }
+        CustomerEntity customerEntity = customerRepository.findCustomerEntityByEmail(username).orElseThrow(
+                () -> new BadCredentialsException("No user registered with this details!")
+        );
+        if (passwordEncoder.matches(pwd, customerEntity.getPwd())) {
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(customerEntity.getRole()));
+            return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
         } else {
-            throw new BadCredentialsException("No user registered with this details!");
+            throw new BadCredentialsException("Invalid password!");
         }
     }
 
