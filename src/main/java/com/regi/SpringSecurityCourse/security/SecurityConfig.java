@@ -17,6 +17,10 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 import javax.sql.DataSource;
 
+import static com.regi.SpringSecurityCourse.security.AppUserPermission.WRITE;
+import static com.regi.SpringSecurityCourse.security.AppUserRole.ADMIN;
+import static com.regi.SpringSecurityCourse.security.AppUserRole.USER;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -25,8 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors().and()
                 .authorizeRequests()
-                .antMatchers("/api/account").authenticated()
-                .antMatchers("/api/balance").authenticated()
+                .antMatchers("/api/account").hasRole(ADMIN.name())
+                .antMatchers("/api/balance").hasAnyAuthority(WRITE.getPermission())
                 .antMatchers("/api/loans").authenticated()
                 .antMatchers("/api/cards").authenticated()
                 .antMatchers("/api/customer").authenticated()

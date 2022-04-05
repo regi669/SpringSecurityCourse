@@ -16,9 +16,7 @@ public class SecurityCustomerEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(customerEntity.getRole()));
-        return authorities;
+        return customerEntity.getRole().getGrantedAuthority();
     }
 
     @Override

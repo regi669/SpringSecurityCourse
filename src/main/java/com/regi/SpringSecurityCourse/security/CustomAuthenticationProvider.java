@@ -33,9 +33,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 () -> new BadCredentialsException("No user registered with this details!")
         );
         if (passwordEncoder.matches(pwd, customerEntity.getPwd())) {
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(customerEntity.getRole()));
-            return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
+            return new UsernamePasswordAuthenticationToken(username, pwd, customerEntity.getRole().getGrantedAuthority());
         } else {
             throw new BadCredentialsException("Invalid password!");
         }

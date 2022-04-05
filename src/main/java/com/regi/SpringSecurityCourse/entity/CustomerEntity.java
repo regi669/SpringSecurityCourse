@@ -1,5 +1,6 @@
 package com.regi.SpringSecurityCourse.entity;
 
+import com.regi.SpringSecurityCourse.security.AppUserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,5 +26,5 @@ public class CustomerEntity {
 
     private String pwd;
 
-    private String role;
+    private AppUserRole role;
 }
