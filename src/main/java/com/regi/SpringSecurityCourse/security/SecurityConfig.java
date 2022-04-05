@@ -1,6 +1,8 @@
 package com.regi.SpringSecurityCourse.security;
 
 import com.regi.SpringSecurityCourse.security.filter.AuthoritiesLoggingAfterFilter;
+import com.regi.SpringSecurityCourse.security.filter.JWTTokenGeneratorFilter;
+import com.regi.SpringSecurityCourse.security.filter.JWTTokenValidatorFilter;
 import com.regi.SpringSecurityCourse.security.filter.RequestValidationBeforeFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,9 +33,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors().and()
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() //This tells spring to not create any tokens by default
+                .csrf().disable().cors().and()
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class) //do not use addFilterAt because it's random and not recommended
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/api/account").hasRole(ADMIN.name())
                 .antMatchers("/api/balance").hasAnyAuthority(WRITE.getPermission())
@@ -41,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/customer").authenticated()
                 .antMatchers("/api/notices").permitAll()
                 .antMatchers("/api/contact").permitAll()
+                .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

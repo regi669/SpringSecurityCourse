@@ -22,7 +22,7 @@ import static org.springframework.security.web.authentication.www.BasicAuthentic
 public class RequestValidationBeforeFilter implements Filter {
 
     public static final String AUTHENTICATION_PREFIX = "Basic";
-    private Charset credentialCharset = StandardCharsets.UTF_8;
+    private final Charset credentialCharset = StandardCharsets.UTF_8;
 
 
     @Override
@@ -44,7 +44,7 @@ public class RequestValidationBeforeFilter implements Filter {
                         throw new BadCredentialsException("Invalid basic authentication token");
                     }
                     String email = token.substring(0, delim);
-                    if(email.toLowerCase().contains("test")) { //checking if email contains test in its name if yes returns bad req 400
+                    if (email.toLowerCase().contains("test")) { //checking if email contains test in its name if yes returns bad req 400
                         res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         return;
                     }
