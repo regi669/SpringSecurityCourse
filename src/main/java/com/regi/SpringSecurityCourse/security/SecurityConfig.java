@@ -1,5 +1,7 @@
 package com.regi.SpringSecurityCourse.security;
 
+import com.regi.SpringSecurityCourse.security.filter.AuthoritiesLoggingAfterFilter;
+import com.regi.SpringSecurityCourse.security.filter.RequestValidationBeforeFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.sql.DataSource;
 
@@ -22,12 +25,14 @@ import static com.regi.SpringSecurityCourse.security.AppUserRole.ADMIN;
 import static com.regi.SpringSecurityCourse.security.AppUserRole.USER;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors().and()
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class) //do not use addFilterAt because it's random and not recommended
                 .authorizeRequests()
                 .antMatchers("/api/account").hasRole(ADMIN.name())
                 .antMatchers("/api/balance").hasAnyAuthority(WRITE.getPermission())
